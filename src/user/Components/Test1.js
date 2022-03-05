@@ -1,7 +1,7 @@
 import React from "react";
 import { statService } from "../../ServiceFolder/statService";
 import { useState } from "react";
-
+import { getdb } from "../../behaviour/db/getdb"
 function Test(props) {
 
     const [count, setCount] = useState(0);

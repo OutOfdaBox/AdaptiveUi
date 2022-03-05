@@ -1,9 +1,7 @@
 import React, { useEffect, useLayoutEffect } from "react";
 import Box from "./Box";
+import _ from "lodash";
 import { statService } from '../../ServiceFolder/statService'
-import objectHash from "object-hash";
-import { set, sortBy } from "lodash";
-import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 
 /*
     Every new container components will start a new entry of its database as
@@ -20,7 +18,7 @@ import { isLabelWithInternallyDisabledControl } from "@testing-library/user-even
         }
     }
 */
-var database = {}
+export var database = {}
 
 
 function Container(props) {
@@ -56,7 +54,6 @@ function Container(props) {
                 })
             })
             localStorage.setItem("db", JSON.stringify(database))
-            console.log(database)
         } catch (error) {
             console.log("error initialising database", error)
         }
@@ -95,7 +92,6 @@ function Container(props) {
     function updatedb(key, action) {
         try {
             database[DATABSE_ID][action][key] += 1
-            console.log(database);
         }
         catch (error) {
             console.log("Error updating database", error)
@@ -116,15 +112,18 @@ function Container(props) {
     function handleRender(action) {
         try {
             reflectdb();
-            var newLayouts = layouts.sort(genComp(action))
+            var newLayouts = []
+            //sorting and shallow cloning to update page.
+            layouts.sort(genComp(action)).forEach((child) => newLayouts.push(child));
             setLayouts(newLayouts)
+            console.log(layouts);
         } catch (error) {
             console.log("Error trying to rearrange children", error)
         }
     }
 
+
     useEffect(() => {
-        setLayouts(props.children);
         var subscription = statService.getStats().subscribe((message) => {
             if (message == undefined) {
                 initdb();
@@ -137,8 +136,8 @@ function Container(props) {
         return () => {
             subscription.unsubscribe();
         }
-    }, [props.children]);
 
+    }, [])
 
     return (
         <>
